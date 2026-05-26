@@ -1,0 +1,73 @@
+name: Deploy microservicio a EC2
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clonar el repositorio
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # 2. Configurar Java 17
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # 3. Compilar con Maven
+      - name: Build con Maven
+        run: mvn clean package -DskipTests
+
+      # 4. Login en Docker Hub
+      - name: Login en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 5. Build y push de la imagen
+      - name: Build y push imagen Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/microservicio:latest
+
+      # 6. Conectarse a EC2 y desplegar
+      - name: Desplegar en EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.USER_SERVER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: DOCKERHUB_USERNAME
+          script: |
+            # Configurar credenciales AWS (opcional, por si necesitas usar AWS CLI dentro)
+            export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            export AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}
+
+            # Detener y eliminar contenedor anterior si existe
+            sudo docker stop my-app || true
+            sudo docker rm my-app || true
+
+            # Descargar la imagen más reciente
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/microservicio:latest
+
+            # Levantar nuevo contenedor
+            sudo docker run -d \
+              --name my-app \
+              -p 8080:8080 \
+              --restart unless-stopped \
+              ${{ secrets.DOCKERHUB_USERNAME }}/microservicio:latest
+
+            # Mostrar contenedores activos
+            sudo docker ps
