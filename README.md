@@ -20,7 +20,6 @@ Docker Hub → EC2)**.
 7. [Configuración AWS](#7-configuración-aws)
 8. [Despliegue automatizado (CI/CD)](#8-despliegue-automatizado-cicd)
 9. [Cómo ejecutar y probar](#9-cómo-ejecutar-y-probar)
-10. [Cumplimiento de la pauta](#10-cumplimiento-de-la-pauta)
 ---
  
 ## 1. Descripción del caso
@@ -207,20 +206,7 @@ curl "http://localhost:8080/api/guias/guia123/descargar?periodo=20211&transporti
 ```
  
 ---
- 
-## 10. Cumplimiento de la pauta
- 
-| N° | Criterio | Estado |
-|----|----------|--------|
-| 1 | Configura el almacenamiento temporal en EFS | Implementado |
-| 2 | Sube los archivos generados a AWS S3 (organizados) | Implementado |
-| 3 | Modifica y actualiza los archivos en AWS S3 | Implementado |
-| 4 | Descarga los archivos desde AWS S3 (con permisos) | Implementado |
-| 5 | Consulta el historial de archivos generados | Implementado |
-| 6 | Despliega la aplicación mediante pipeline automatizado | Implementado |
-| 7 | Video explicativo de la solución | Por presentar |
- 
----
+
  
 ## Autores
  
