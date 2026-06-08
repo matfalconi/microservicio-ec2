@@ -15,10 +15,11 @@
     <artifactId>microservicio</artifactId>
     <version>1.0</version>
     <name>microservicio</name>
-    <description>Microservicio de ejemplo para despliegue en EC2</description>
+    <description>Sistema de Gestion de Pedidos y Generacion de Guias de Despacho</description>
 
     <properties>
         <java.version>17</java.version>
+        <aws.sdk.version>2.25.30</aws.sdk.version>
     </properties>
 
     <dependencies>
@@ -26,9 +27,24 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>7.2.5</version>
+            <type>pom</type>
+        </dependency>
     </dependencies>
 
     <build>
+        <!-- IMPORTANTE: esto hace que el jar final se llame microservicio.jar,
+             que es exactamente lo que tu Dockerfile espera copiar. -->
         <finalName>microservicio</finalName>
         <plugins>
             <plugin>
@@ -37,5 +53,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
